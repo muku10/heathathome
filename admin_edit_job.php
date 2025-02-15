@@ -26,12 +26,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $title = $_POST['title'];
     $openings = $_POST['openings'];
     $job_type = $_POST['job_type'];
+    $qualification = $_POST['qualification']; // Added qualification field
     $shift = $_POST['shift'];
     $published_date = $_POST['published_date'];
 
     // Validate inputs
-    if (!empty($title) && !empty($openings) && !empty($job_type) && !empty($shift) && !empty($published_date)) {
-        $sql = "UPDATE jobs SET title = '$title', openings = '$openings', job_type = '$job_type', shift = '$shift', published_date = '$published_date' WHERE id = $job_id";
+    if (!empty($title) && !empty($openings) && !empty($job_type) && !empty($qualification) && !empty($shift) && !empty($published_date)) {
+        $sql = "UPDATE jobs SET title = '$title', openings = '$openings', job_type = '$job_type', qualification = '$qualification', shift = '$shift', published_date = '$published_date' WHERE id = $job_id";
         
         if (mysqli_query($conn, $sql)) {
             echo "<script>alert('Job updated successfully'); window.location.href='admin_jobs.php';</script>";
@@ -77,6 +78,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </select>
             </div>
             <div class="form-group">
+                <label>Qualification</label>
+                <select class="form-control" name="qualification" required>
+                    <option value="Master's Degree" <?php if ($job['qualification'] == "Master's Degree") echo 'selected'; ?>>Master's Degree</option>
+                    <option value="Bachelor's Degree" <?php if ($job['qualification'] == "Bachelor's Degree") echo 'selected'; ?>>Bachelor's Degree</option>
+                    <option value="PhD" <?php if ($job['qualification'] == 'PhD') echo 'selected'; ?>>PhD</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label>Shift</label>
                 <select class="form-control" name="shift" required>
                     <option value="Morning" <?php if ($job['shift'] == 'Morning') echo 'selected'; ?>>Morning</option>
@@ -88,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <label>Published Date</label>
                 <input type="date" class="form-control" name="published_date" value="<?php echo $job['published_date']; ?>" required>
             </div>
-           
+
             <button type="submit" class="btn btn-primary">Update Job</button>
             <a href="admin_job_view.php" class="btn btn-secondary ml-3">Back to Job List</a>
         </form>
