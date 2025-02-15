@@ -1,11 +1,6 @@
 <?php
 // Start session for authentication (optional)
 session_start();
-/*
-if (!isset($_SESSION['admin_logged_in'])) {
-    header("Location: login.php"); // Redirect to login if not logged in
-    exit;
-} */
 
 include 'db.php'; // Include your DB connection
 
@@ -13,15 +8,14 @@ include 'db.php'; // Include your DB connection
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $title = $_POST['title'];
     $description = $_POST['description'];
-    $image = $_POST['image']; // In practice, this should handle file uploads
-    
+    $image = $_POST['image']; // You can replace this with file upload handling if needed
 
     if (isset($_POST['edit'])) {
         // Update service
-        $sql = "UPDATE services SET title='$title', description='$description', image='$image',  WHERE id=" . $_POST['edit'];
+        $sql = "UPDATE services SET title='$title', description='$description', image='$image' WHERE id=" . $_POST['edit'];
     } else {
         // Insert new service
-        $sql = "INSERT INTO services (title, description, image, link) VALUES ('$title', '$description', '$image')";
+        $sql = "INSERT INTO services (title, description, image) VALUES ('$title', '$description', '$image')";
     }
 
     if ($conn->query($sql) === TRUE) {
@@ -85,24 +79,24 @@ $result = $conn->query($sql);
             </tr>
         </thead>
         <tbody>
-            <?php
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    echo "<tr>";
-                    echo "<td>" . $row['id'] . "</td>";
-                    echo "<td>" . $row['title'] . "</td>";
-                    echo "<td>" . $row['description'] . "</td>";
-                    echo "<td><img src='" . $row['image'] . "' alt='" . $row['title'] . "' width='50'></td>";
-                    echo "<td><a href='" . $row['link'] . "' target='_blank'>View</a></td>";
-                    echo "<td>
-                        <a href='add_service.php?edit=" . $row['id'] . "' class='btn btn-warning'>Edit</a>
-                        <a href='add_service.php?delete=" . $row['id'] . "' class='btn btn-danger'>Delete</a>
-                    </td>";
-                    echo "</tr>";
-                }
-            }
-            ?>
-        </tbody>
+    <?php
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            echo "<tr>";
+            echo "<td>" . $row['id'] . "</td>";
+            echo "<td>" . $row['title'] . "</td>";
+            echo "<td>" . $row['description'] . "</td>";
+            echo "<td><img src='" . $row['image'] . "' alt='" . $row['title'] . "' width='50'></td>";
+            echo "<td>
+                <a href='add_service.php?edit=" . $row['id'] . "' class='btn btn-warning'>Edit</a>
+                <a href='add_service.php?delete=" . $row['id'] . "' class='btn btn-danger'>Delete</a>
+            </td>";
+            echo "</tr>";
+        }
+    }
+    ?>
+</tbody>
+
     </table>
 </div>
 
@@ -130,7 +124,6 @@ if (isset($_GET['edit'])) {
         document.getElementById('title').value = '" . $service['title'] . "';
         document.getElementById('description').value = '" . $service['description'] . "';
         document.getElementById('image').value = '" . $service['image'] . "';
-        document.getElementById('link').value = '" . $service['link'] . "';
     </script>";
 }
 ?>
