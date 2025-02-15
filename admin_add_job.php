@@ -1,32 +1,36 @@
 <?php
 include 'db.php'; // Include the database connection
 
+// Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Get form data
     $title = $_POST['title'];
     $openings = $_POST['openings'];
     $job_type = $_POST['job_type'];
+    $qualification = $_POST['qualification'];
     $shift = $_POST['shift'];
     $published_date = $_POST['published_date'];
-    
 
     // Validate inputs
-    if (!empty($title) && !empty($openings) && !empty($job_type) && !empty($shift) && !empty($published_date) ) {
-        $sql = "INSERT INTO jobs (title, openings, job_type, shift, published_date) 
-                VALUES ('$title', '$openings', '$job_type', '$shift', '$published_date')";
-        
-        if (mysqli_query($conn, $sql)) {
-            echo "<script>alert('Job added successfully'); window.location.href='admin_add_job.php';</script>";
+    if (!empty($title) && !empty($openings) && !empty($job_type) && !empty($qualification) && !empty($shift) && !empty($published_date)) {
+        // Use prepared statements to prevent SQL injection
+        $sql = "INSERT INTO jobs (title, openings, job_type, qualification, shift, published_date) 
+                VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "sissss", $title, $openings, $job_type, $qualification, $shift, $published_date);
+        $success = mysqli_stmt_execute($stmt);
+
+        if ($success) {
+            echo "<script>alert('Job added successfully'); window.location.href='admin_job_view.php';</script>";
         } else {
             echo "Error: " . mysqli_error($conn);
         }
+
+        mysqli_stmt_close($stmt);
     } else {
         echo "<script>alert('All fields are required');</script>";
     }
-}
-
-mysqli_close($conn);
-?>
-
+} ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -57,6 +61,14 @@ mysqli_close($conn);
                 </select>
             </div>
             <div class="form-group">
+                <label>Qualification</label>
+                <select class="form-control" name="qualification" required>
+                    <option value="Master's Degree">Master's Degree</option>
+                    <option value="Bachelor's Degree">Bachelor's Degree</option>
+                    <option value="PhD">PhD</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label>Shift</label>
                 <select class="form-control" name="shift">
                     <option value="Morning">Morning</option>
@@ -68,9 +80,12 @@ mysqli_close($conn);
                 <label>Published Date</label>
                 <input type="date" class="form-control" name="published_date" required>
             </div>
-           
+
             <button type="submit" class="btn btn-primary">Add Job</button>
         </form>
     </div>
 </body>
 </html>
+<?php
+mysqli_close($conn);
+?>
